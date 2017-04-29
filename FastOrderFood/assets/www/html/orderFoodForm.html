@@ -1,0 +1,318 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+
+<link rel="stylesheet" href="../js/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="../css/signUp.css">
+<link rel="stylesheet" href="../css/icon.css">
+<!-- <script src="../js/jquery.js"></script> -->
+<script src="../js/jquery-1.11.1.js"></script>
+<script src="../js/jquery.mobile-1.4.5.min.js"></script>
+<script src="../js/com_ajax.js"></script>
+<script src="../js/fpCookie.js"></script>
+
+<script type="text/javascript">
+//
+	var recv;
+	var orderInfos = [];
+	var sum = 0;
+	var orderFoodNum = 0;
+	var getJsonData = null;
+	var restaurantId = 9;
+	var tableNo = 41; //need modify
+//	var num = 9;
+	
+	function OrderInfo(foodId, categoryId, foodName, quantity, price) {
+		this.foodId = foodId;
+		this.categoryId = categoryId;
+		this.foodName = foodName; //주문할 음식
+		this.quantity = quantity; //수량
+		this.price = price; //단가
+	}
+	
+	$(document).ready(function() {
+		getJsonData = JSON.parse(fpGetCookie("orderInfos"));
+		console.log("getJsonData = " + getJsonData);
+		
+		//객체를 출력
+		for (var i in getJsonData) {
+			if (getJsonData[i] != null) {
+				console.log(getJsonData[i].foodName + ", " + getJsonData[i].quantity);
+				orderInfos.push(getJsonData[i]);
+			} else {
+				console.log(i + "번째 데이터는 null 입니다.");
+			}
+		}
+		
+		recvData("post", connIp + "/company/myShop/" + restaurantId + "/menuListRsp/", function(data) { //need modify
+			var jsonData = JSON.stringify(data);
+//			console.log(jsonData);
+			recv = JSON.parse(jsonData);
+
+			for (var i in recv) {
+				console.log('+ ' + recv[i].categoryName);
+				
+				var content = "<div data-role='collapsible' data-iconpos='right' data-collapsed='true' id='category" + i + "'>"
+				 + "<h3>" + recv[i].categoryName + "</h3><ul id='ul_id" + i + "' data-role='listview' data-theme='b'></ul></div>";
+				 
+				var ul_id = '#ul_id' + i;
+				
+				$("#foodList").append(content);
+				
+				$('div[data-role=collapsible]').collapsible();
+				
+				for (var j in recv[i].menu) {
+					if (recv[i].menu != null) {
+						console.log(' - ' + recv[i].menu[j].food_name);
+						
+						var path;
+						if (recv[i].menu[j].foodImgPath != null) {
+							path = connIp + "/img/menu/" + recv[i].menu[j].foodImgPath;
+						} else {
+							path = connIp + "/img/menu/No_image.png";
+						}
+						
+						var foodId = recv[i].menu[j].food_ID;
+						var foodName = recv[i].menu[j].food_name;
+						
+						content = 
+						"<li><a href='#'>" + foodName + 
+						"<div class='ui-grid-a'>" + 
+						"<div class='ui-block-a' align='left'>" + 
+							"<br/><img src='" + path + "' /></div>" + 
+						"<div class='ui-block-b' align='left'>" + 
+							"<h5>열량 : " + recv[i].menu[j].calory + "kcal</h5>" + 
+							"<h5>가격 : " + recv[i].menu[j].pay + "원</h5>" +  
+						"<span>개수 : </span>" + 
+						"<select id='select_count" + foodId + "' " +  
+						"data-native-menu='false' data-inline='true'>" + 
+							"<option value='1'>1</option>" +
+							"<option value='2'>2</option>" + 
+							"<option value='3'>3</option>" + 
+							"<option value='4'>4</option>" + 
+							"<option value='5'>5</option>" + 
+							"<option value='6'>6</option>" +
+							"<option value='7'>7</option>" + 
+							"<option value='8'>8</option>" + 
+							"<option value='9'>9</option>" + 
+							"<option value='10'>10</option>" + 
+						"</select>" + 
+						"<button id='btnAdd" + foodId + "' class='ui-btn ui-corner-all' onclick='orderAdd(" + i + ", " + j + ")'>추가</button>" + 
+						"</div>" + 
+						"</div></a></li>";
+						
+						$(ul_id).append(content);
+						
+						if (recv[i].menu[j].foodImgPath) {
+							console.log('   ㄴpath : ' + recv[i].menu[j].foodImgPath);
+						}
+					}
+				}
+//				$('ul').listview('refresh');
+			}
+			$('div[data-role=collapsible]').collapsibleset().trigger('create');
+		});
+		
+	});
+	
+	function orderAdd(i, j) {
+		
+		console.log("i = " + i + ", j = " + j);
+		
+		var foodId = recv[i].menu[j].food_ID;
+		var categoryId = recv[i].categoryId;
+		var foodName = recv[i].menu[j].food_name;
+		var price = recv[i].menu[j].pay;
+		
+		console.log("foodId = " + foodId);
+		console.log("categoryId = " + categoryId);
+		console.log(recv[i].menu[j]);
+		console.log(price);
+		
+		/* 음식 수량 */
+		var count = 'select_count' + foodId;
+		var foodCountValue = document.getElementById(count).value;
+		console.log("수량 = " + foodCountValue);
+		 
+		orderInfos.push(new OrderInfo(foodId, categoryId, foodName, foodCountValue, price));
+		/* 
+		//테스트 코드 시작
+		//orderInfos 데이터를 JSON으로 변환
+		var orderInfosJSON = JSON.stringify(orderInfos);
+		
+		console.log("test = " + orderInfosJSON);
+		
+		//쿠키정보를 JSON 형태로 집어넣음
+		fpSetCookie("orderInfos", orderInfosJSON);
+		
+		//JSON으로 저장된 쿠키정보를 얻어옴
+		var test2 = fpGetCookie("orderInfos");
+		
+		console.log("test2 = " + test2);
+		
+		//얻어옴 JSON 데이터를 객체 형태로 만듦
+		var test3 = JSON.parse(fpGetCookie("orderInfos"));
+		
+		//객체를 출력
+		for (var i in test3) {
+			console.log(test3[i].foodName + ", " + test3[i].quantity);
+		}
+		//테스트 코드 끝
+		*/
+		
+		setOrderInfoCookie();
+		
+		getJsonData = JSON.parse(fpGetCookie("orderInfos"));
+		console.log("getJsonData = " + getJsonData);
+		
+		//객체를 출력
+		for (var i in getJsonData) {
+			if (getJsonData[i] != null) {
+				console.log(getJsonData[i].foodName + ", " + getJsonData[i].quantity);
+			}
+		}
+		
+		orderFoodNum++;
+		
+	}
+	
+	function setOrderInfoCookie() {
+		//orderInfos 데이터를 JSON으로 변환
+		var orderInfosJSON = JSON.stringify(orderInfos);
+		
+		//쿠키정보를 JSON 형태로 집어넣음
+		fpSetCookie("orderInfos", orderInfosJSON);
+	}
+	
+	function showOrderList() {
+		
+		$('#orderFoodGroup').empty();
+		
+		setOrderInfoCookie();
+		
+		sum = 0; //합계
+		
+		var content = ""; 
+		for (var i in orderInfos) {
+			content += "<label for='order" + i + "'>" + orderInfos[i].foodName + " " +
+			"<p>" + orderInfos[i].price + "원 * " + orderInfos[i].quantity + "개 </p>" + 
+			"</label>" + 
+			"<input type='checkbox' name='orderFoodList' id='order" + i + "' value='" + orderInfos[i].foodName + "' >";
+			sum += (orderInfos[i].price * orderInfos[i].quantity);
+		}
+		$('#orderFoodGroup').append(content);
+		
+		$("#orderFood").trigger('create');
+		
+		document.getElementById("payDisplay").innerHTML="결제금액 : " + sum + " 원";
+	}
+	
+	function selectDel() {
+		
+		for (var i in orderInfos) {
+			var orderId = document.getElementById("order" + i);
+			console.log("orderId = " + orderId);
+			if(orderId.checked) {
+				delete(orderInfos[i]);
+			}
+		}
+		
+		showOrderList();
+	}
+	
+	function selecOrder() {
+//		alert('food order');
+		document.location.href="payMentCard.html";
+	}
+	
+</script>
+	
+
+<style>
+	img {
+		max-width:80%; 
+		width: expression(this.width > 500 ? 500: true); 
+		height: auto;
+	}
+	
+	div.ui-checkbox {
+		margin-top: 0px;
+    	margin-bottom: 0px;
+	}
+</style>
+
+<body>
+<div data-role="page" id="orderFood">
+
+	<!-- 패널 코드 시작 -->
+	<div data-role="panel" id="myPanel" data-theme="b" data-position-fixed="true" data-position="left" > 
+	     <a class="ui-btn ui-icon-home ui-btn-icon-left" data-rel="back">Home</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Foward</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left">Back</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Right Arrow Button</a>
+  	</div>
+  	
+  	<div data-role="panel" id="myPanel2" data-theme="b" data-position-fixed="true" data-position="right" > 
+			<h3>- 장바구니 -</h3>
+			<p>상품 내역</p>
+	      	
+	      	<div data-role="fieldcontain" data-iconpos="right" class="ui-field-contain">
+				<fieldset data-role="controlgroup" id="orderFoodGroup" data-iconpos='right'>
+					<!-- items will be injected here -->
+				</fieldset>
+				<br/>				
+				
+				<h3 id="payDisplay">결제금액 : </h3>
+				
+	      	</div>
+	      	
+	    <!-- </div> -->
+		
+		<div class="ui-field-contain">
+			<input type="button" data-inline="true" value="선택삭제" onclick='selectDel()'>
+	      	<input type="button" data-inline="true" value="주문하기" onclick='selecOrder()'>
+		</div>
+			
+  	</div>
+  	<!-- 패널 코드 끝 -->
+  	
+	<div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+		<a href="#myPanel" class="ui-btn ui-corner-all ui-shadow ui-icon-bars ui-btn-icon-left">Menu</a>
+		<a href="#myPanel2" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-shopping-cart ui-btn-icon-left" onclick='showOrderList()'>Cart</a>
+	    <h1>Food Pass</h1>
+  	</div>
+	
+	<div data-role="main" class="ui-content">
+	 	<div data-role="collapsibleset" data-content-theme="a" data-iconpos="right" id="foodList">
+	 		
+	 	</div>
+	 	
+	</div>
+	
+	<div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+		<h4 align="center">TheodoreSoft Corporation. </h4>
+  	</div>
+
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

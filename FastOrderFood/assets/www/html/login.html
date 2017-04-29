@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<!-- Include meta tag to ensure proper rendering and touch zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Include jQuery Mobile stylesheets -->
+<link rel="stylesheet" href="../js/jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="../css/signUp.css">
+<link rel="stylesheet" href="../css/icon.css">
+<!-- Include the jQuery library -->
+<script src="../js/jquery-1.11.1.js"></script>
+<!--   <script src="js/cordova.js"></script> -->
+<!-- Include the jQuery Mobile library -->
+<script src="../js/jquery.mobile-1.4.5.min.js"></script>
+<script src="../js/jquery.cookie.js"></script>
+<script src="../js/fpCookie.js"></script>
+<style type="text/css">
+
+</style>
+
+<script>
+
+
+/* function fpSetCookie(key, value) {
+	var storage;
+	if (window.localStorage) {
+		storage = window.localStorage;
+	} else if (window.sessionStorage) {
+		storage = window.sessionStorage;
+	} else {
+		console.log("STORAGE를 사용할 수 없습니다.");
+		return;
+	}
+	storage.setItem(key, value);
+}
+
+function fpGetCookie(key) {
+	var storage;
+	if (window.localStorage) {
+		storage = window.localStorage;
+	} else if (window.sessionStorage) {
+		storage = window.sessionStorage;
+	} else {
+		console.log("STORAGE를 사용할 수 없습니다.");
+		return null;
+	}
+	return storage.getItem(key);
+}
+
+function fpRemoveCookie(key) {
+	var storage;
+	if (window.localStorage) {
+		storage = window.localStorage;
+	} else if (window.sessionStorage) {
+		storage = window.sessionStorage;
+	} else {
+		alert("STORAGE를 사용할 수 없습니다.");
+		return;
+	}
+	storage.removeItem(key);
+} */
+
+
+		
+	
+	
+$(document).ready(function() {
+	
+	$('#btn-submit').click(function (event) {
+		
+		//login 빈값 체크
+		function validationForm(){
+		
+			if($('#email').val().trim()==""){
+				$('#email').focus();
+				return false;
+			}
+			if($('#password').val().trim()==""){
+				$('#password').focus();
+				return false;
+			}
+			return true;
+		}
+		
+		if(validationForm()){
+			
+			function sendData(sendType, sendUrl, sendData) {
+				var json_data = JSON.stringify(sendData);
+				console.log(json_data);
+				$.ajax({
+					type: sendType,
+					url: sendUrl,
+					dataType: "jsonp",
+					data: {"data":encodeURIComponent(json_data)},
+					async: false,
+					success: function (data, status, xhr) {
+						//console.log(data);
+						//console.log(status);
+						//console.log("data sending success");
+						//console.log(xhr);
+						//console.log(xhr.getAllResponseHeaders());
+						//console.log(xhr.getResponseHeader("Set-Cookie"));
+						console.log(data);
+						console.log(data.loginCheck);
+						
+						if(data.cookies != null){
+							$.each(data.cookies, function(key, value) {
+								fpMemberSetCookie(key, value);
+							});
+						}
+						
+						console.log(fpMemberGetCookie("JSESSIONID"));
+						//fpRemoveCookie("fpMemberEmail");
+						
+						if(data.loginCheck != null){
+							console.log("loginCheck data 받음");
+							var msg = data.loginCheck;
+							$('font').append(msg);
+							setTimeout(function() {
+								$("font").empty();
+							}, 2000);
+							$('#email').val('');
+							$('#password').val('');
+							$('#email').focus();
+						}else {
+							document.location.href="../html/myPage.html";
+						}
+						
+					},
+					error: function(xhr,status,error){
+						console.log("에러발생");
+					}
+				});
+			
+			}
+			
+			var loginVO = {
+					email : $('#email').val(),
+					passWord : $('#password').val()
+			};
+			
+			sendData("post", connIp + "/inMemberLogin", loginVO);
+	
+		}
+	
+	}); //click function end.
+
+	
+});//ready function end.
+
+
+
+
+
+
+	
+
+
+</script>
+
+
+
+</head>
+<body>
+
+<div data-role="page" id="loginPage">
+  <div data-role="panel" id="myPanel" data-theme="b"> 
+	     <img border="0" src="../img/foodpass_size.png" style="float:right;display:inline" width="50"/>
+		
+	    <h2>Food Pass 는?</h2>
+	    <p>Food Pass 는 음식점에서 주문을 기다리지 않고 각 테이블에 부착되어 있는 QR코드를 스캔하여
+	     <br>기다림없이 바로 원하는 메뉴를 주문할 수 있는 주문결제 시스템 입니다.</p>
+		</br></br>
+	     <a href="../index.html#MainPage" class="ui-btn ui-icon-home ui-btn-icon-left" rel="external">Home</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left" data-rel="prev">Forward</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
+	     <a href="../html/qrTest.html" class="ui-btn ui-icon-camera ui-btn-icon-left">QR-CODE Scan</a>
+	     
+	     
+  </div> 
+  
+  <div data-role="panel" id="cartPanel" data-theme="b" data-swipe-close="true" data-position="right"> 
+	     <h4>장바구니 입니다.</h4>
+	     <P>로그인이 필요합니다.</P>
+  </div> 
+
+
+
+  <div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+	<a href="#myPanel" class="ui-btn ui-corner-all ui-shadow ui-icon-bars ui-btn-icon-left">Menu</a>
+	<a href="#cartPanel" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-shopping-cart ui-btn-icon-left">Cart</a>
+    <h1>Food-Pass</h1>
+  </div>
+
+	
+
+ <div data-role="main" class="ui-content">
+  
+  	
+	<font color="red" id="loginMsg"></font>
+	<!-- <h3>Sign in</h3> -->
+	</br></br></br></br>
+	<!-- <div class="ui-field-contain"> -->
+		
+		<label for="txt-email"><strong>E-mail</strong></label>
+		<input type="text" name="email" id="email" value="">
+		
+		<label for="txt-password"><strong>Password</strong></label>
+		<input type="password" name="password" id="password" value="">
+		
+		<!-- <fieldset data-role="controlgroup">
+		    <input type="checkbox" name="chck-rememberme" id="chck-rememberme" >
+		    <label for="chck-rememberme">사용자 정보 저장</label>
+		</fieldset> -->
+		
+		</br>
+		
+		<!-- data-rel="popup" data-transition="pop" data-position-to="window" -->
+		<a id="btn-submit" class="ui-btn ui-btn-b ui-corner-all mc-top-margin-1-5" rel="external">로그인</a>
+		<p class="mc-top-margin-1-5"><a href="begin-password-reset.html">Can't access your account?</a></p>
+
+	<!-- </div> -->	
+	
+		</br>
+		<a href="../html/signUp.html" id="moveSignUp" class="ui-btn ui-btn-a ui-corner-all mc-top-margin-1-5" rel="external">회원가입</a>
+
+</div>	    	
+
+  
+    
+  
+	<!-- <button onclick="fpRemoveCookie('JSESSIONID')">Logout</button> -->
+
+
+  <div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+	<h4 align="center">TheodoreSoft Corporation. </h4>
+  </div>
+
+
+
+	<!-- login Message Popup -->
+	<div id="loginErrMsg" data-role="popup" data-overlay-theme="a" data-theme="b" class="ui-content">
+	  <p><code>data-theme="b"</code> and <code>data-overlay-theme="a"</code> set on me</p>
+	</div>
+
+
+</div>
+
+
+</body>
+
+
+</html>
+ 

@@ -1,0 +1,176 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<!-- Include meta tag to ensure proper rendering and touch zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Include jQuery Mobile stylesheets -->
+<link rel="stylesheet" href="../js/jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="../css/icon.css">
+<!-- Include the jQuery library -->
+<script src="../js/jquery-1.11.1.js"></script>
+<!--   <script src="js/cordova.js"></script> -->
+<!-- Include the jQuery Mobile library -->
+<script src="../js/jquery.mobile-1.4.5.min.js"></script>
+<script type="text/javascript" src="../js/qrcodeReader.js"></script>
+
+<style type="text/css">
+  
+  
+</style>
+
+<script>
+
+$(document).ready(function(){
+	
+	qrcode.callback = read;
+	$('#qr-canvas').hide();
+	$('#outdiv').hide();
+	
+	$("input[name='imgCamera']").change(function(e){
+		var fileList = this.files;
+		for(var i=0; i<fileList.length ; i++){
+			var reader = new FileReader();
+			reader.onload =(function(theFile){
+				return function(e){
+					var gCanvas = document.getElementById("qr-canvas");
+					var gCtx = gCanvas.getContext("2d");
+					gCtx.clearRect(0, 0, gCanvas.width, gCanvas.height);
+					qrcode.decode(e.target.result);
+				};
+			})(fileList[i]);
+			reader.readAsDataURL(fileList[i]);
+		}
+	})
+	
+	function htmlEntities(str) {
+	    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+	}
+	
+	function read(a)
+	{
+	    var str="";
+	    //document.location.href= a;
+	    console.log("a : " + a);
+	    
+	    if(a.indexOf("../")===0 || a.indexOf("/")=== 0 || a.indexOf("html")=== 0){
+	    	document.location.href= a;
+	    }else {
+	    	alert("이미지를 밝은곳에서 다시 한번 촬영해 주세요.");
+	    	$('#qrScan').val('');
+	    }
+	    
+	    
+	    
+	    if(a.indexOf("http://") === 0 || a.indexOf("https://") === 0){
+	        str+="<a href='"+a+"'>"+a+"</a><br>";
+	    }else{
+		    str+="<b>"+htmlEntities(a)+"</b>";
+	    }
+	    console.log("str : " + str);
+	    
+	    $("#result").html(str);
+	}
+	
+	
+	
+});
+
+		
+	
+
+</script>
+
+
+
+</head>
+<body>
+
+<div data-role="page" id="pageone">
+  <div data-role="panel" id="myPanel" data-theme="b"> 
+	     <h2>Food Pass 는?</h2>
+	    <p>Food Pass 는 음식점에서 주문을 기다리지 않고 각 테이블에 부착되어 있는 QR코드를 스캔하여
+	     <br>기다림없이 바로 원하는 메뉴를 주문할 수 있는 주문결제 시스템 입니다.</p>
+		</br></br>
+	     <a href="../index.html#MainPage" class="ui-btn ui-icon-home ui-btn-icon-left" rel="external">Home</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left" data-rel="prev">Forward</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left" data-rel="back">Back</a>
+	     <a href="../html/qrTest.html" class="ui-btn ui-icon-camera ui-btn-icon-left">QR-CODE Scan</a>
+  </div> 
+  
+  <div data-role="panel" id="cartPanel" data-theme="b" data-swipe-close="true" data-position="right"> 
+	     <h4>장바구니 입니다.</h4>
+	     <P>로그인이 필요합니다.</P>
+  </div> 
+
+
+
+  <div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+	<a href="#myPanel" class="ui-btn ui-corner-all ui-shadow ui-icon-bars ui-btn-icon-left">Menu</a>
+	<!-- <a href="#cartPanel" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-shopping-cart ui-btn-icon-left">Cart</a> -->
+    <h1>Food Pass</h1>
+  </div>
+
+	
+
+	<div data-role="main" class="ui-content">
+  
+  		<div id="container">
+		<div id="cam">
+			<br/>
+			<input id="qrScan" type="file" accept="image/*" capture="camera" name="imgCamera"><br/>
+		</div>
+		<br/>
+	
+		<div>
+			<H3><p><font color="red">FOOD-PASS</font> 시스템 이용 방법</p></H3></br>
+		
+			<img src="../img/foodpassicon.png" alt="" style="width: 30%;" />
+			</br>
+			<h4>1. FOOD-PASS 로고가 있는 테이블에 부착되어 있는 QR-CODE 가 부착되어 있는지 확인한다.</h4>
+			<h4>2. 위의 버튼을 이용하여 QR-CODE 를 스캔한다. </h4>
+			<h4>3. 메뉴 주문 및 결제 기능을 이용한다. </h4>
+		</div>	
+	
+		<div id="outdiv" style="width:320px; height:240px; border: solid; visibility: hidden">
+			<div id="qrfile">
+				<canvas id="out-canvas" width="320" height="240" ></canvas>
+			</div>
+		</div>
+		<br/>
+		
+		<div id="result" style="border: solid; border-width: 1px 1px 1px 1px; padding:20px; width:70%; visibility: hidden"></div>
+	</div>
+	
+	<canvas id="qr-canvas" width="800" height="600" style="visibility: hidden;"></canvas>
+  
+  
+  
+	</div>	    	
+	
+
+
+ <!--  <div data-role="navbar">
+      <ul>
+        <li><a href="#" data-icon="home" data-theme="a">HOME</a></li>
+        <li><a href="#" data-icon="arrow-r">FORWARD</a></li>
+        <li><a href="#" data-icon="arrow-r">BACK</a></li>
+        <li><a href="#" data-icon="search" data-theme="a">SEARCH</a></li>
+      </ul>
+    </div>   --> 
+  <div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+	<h4 align="center">TheodoreSoft Corporation. </h4>
+  </div>
+
+
+</div>
+
+
+
+
+</body>
+
+
+</html>
+ 

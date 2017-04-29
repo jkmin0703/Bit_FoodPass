@@ -1,0 +1,279 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<!-- Include meta tag to ensure proper rendering and touch zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Include jQuery Mobile stylesheets -->
+<link rel="stylesheet" href="../js/jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="../css/signUp.css">
+<link rel="stylesheet" href="../css/icon.css">
+<!-- Include the jQuery library -->
+<script src="../js/jquery-1.11.1.js"></script>
+<!--   <script src="js/cordova.js"></script> -->
+<!-- Include the jQuery Mobile library -->
+<script src="../js/jquery.mobile-1.4.5.min.js"></script>
+<script src="../js/jquery.payment.js"></script>
+<link rel="stylesheet" href="../css/card.css">
+<script src="../js/com_ajax.js"></script>
+<script src="../js/fpCookie.js"></script>
+<script src="../js/card.js"></script>
+
+<style type="text/css">
+ .demo-container {
+            width: 100%;
+            max-width: 350px;
+            margin: 50px auto;
+        }
+
+        form {
+            margin: 30px;
+        }
+        input {
+            width: 200px;
+            margin: 10px auto;
+            display: block;
+        }
+ .ui-field-contain{
+ 	width: 20%;
+ 
+ 
+ }
+
+</style>
+
+<script type="text/javascript">
+	
+	var orderInfos = [];
+	var orderInfoJsons = [];
+	var getJsonData = null;
+	var sendJsonData = null;
+	var sum = 0;
+	var tableNo = 41; //need modify
+	
+	function OrderInfo(foodId, categoryId, foodName, quantity, price) {
+		this.foodId = foodId;
+		this.categoryId = categoryId;
+		this.foodName = foodName; //주문할 음식
+		this.quantity = quantity; //수량
+		this.price = price; //단가
+	}
+	
+	function orderInfoJson(tableNo, foodId, price, quantity) {
+		this.tableNo = tableNo;
+		this.foodId = foodId;
+		this.price = price;
+		this.quantity = quantity;
+	}
+	
+	$(document).ready(function() {
+		getJsonData = JSON.parse(fpGetCookie("orderInfos"));
+		console.log("getJsonData = " + getJsonData);
+		
+		//객체를 출력
+		for (var i in getJsonData) {
+			if (getJsonData[i] != null) {
+				console.log(getJsonData[i].foodName + ", " + getJsonData[i].quantity);
+				orderInfos.push(getJsonData[i]);
+			} else {
+				console.log(i + "번째 데이터는 null 입니다.")
+			}
+		}
+		
+		sum = 0;
+		
+		for (var i in orderInfos) {
+			var content = 
+						"<li data-icon='false'><a href='#'>" + 
+						orderInfos[i].foodName + " " + 
+						orderInfos[i].price + "원 * " +  orderInfos[i].quantity + "개	: " + 
+						orderInfos[i].price*orderInfos[i].quantity + "원" + 
+						"</a></li>";
+			
+			sum += (orderInfos[i].price*orderInfos[i].quantity);
+						
+			/* content += "<li>"
+					+= "aaaaa"
+					+= "</li>"; */
+					
+			$("#orderListView").append(content);
+			$("#orderListView").listview('refresh');
+		}
+		
+		document.getElementById("payDisplay").innerHTML="결제금액 : " + sum + " 원";
+		
+	});
+	
+	function panmentReq() {
+		
+		for (var i in orderInfos) {
+			var foodId = orderInfos[i].foodId;
+			var price = orderInfos[i].price;
+			var quantity = orderInfos[i].quantity;
+			orderInfoJsons.push(new orderInfoJson(tableNo, foodId, price, quantity));
+		}
+		
+		var json_data = JSON.stringify(orderInfoJsons);
+		console.log(json_data);
+		$.ajax({
+			type: "post",
+			url: connIp + "/order/rsp/" + 9 + "/orderInfoJson/" + tableNo,
+			dataType: "jsonp",
+			data: {"data":encodeURIComponent(json_data)},
+			async: false,
+			success: function (data, status, xhr) {
+				console.log("sucess");
+				fpRemoveCookie("orderInfos");
+				document.location.href="paymentSuccess.html";
+			},
+			error: function(xhr,status,error){
+				console.log("occur err");
+			}
+		});
+		
+	}
+	
+	function orderListReq() {
+		$.ajax({
+			type: "post",
+			url: connIp + "/order/orderList/9",
+			dataType: "jsonp",
+			data: {"data":encodeURIComponent(null)},
+			async: false,
+			success: function (data, status, xhr) {
+				console.log("sucess");
+//				sessionStorage.clear();
+//				fpRemoveCookie("orderInfos");
+//				document.location.href="paymentSuccess.html";
+			},
+			error: function(xhr,status,error){
+				console.log("occur err");
+			}
+		});
+	}
+	
+</script>
+
+
+
+</head>
+<body>
+
+<div data-role="page" id="pageone">
+  	<div data-role="panel" id="myPanel" data-theme="b"> 
+  	<img border="0" src="images/foodpass_size.png" style="float:right;display:inline" width="50"/>
+    	<h2>Food Pass 는?</h2>
+    	<p>Food Pass 는 음식점에서 주문을 기다리지 않고 각 테이블에 부착되어 있는 QR코드와 NFC 방식으로
+		설치된 앱을 통해 
+	    <br>기다림없이 바로 주문할 수 있는 주문결제 시스템 입니다.</p>
+  	</div> 
+
+
+
+	<div data-role="panel" id="myPanel" data-theme="b" data-position-fixed="true" data-position="left" > 
+	     <a class="ui-btn ui-icon-home ui-btn-icon-left" data-rel="back">Home</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Foward</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left">Back</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Right Arrow Button</a>
+  	</div>
+  	
+	<div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+		<a href="#myPanel" class="ui-btn ui-corner-all ui-shadow ui-icon-bars ui-btn-icon-left">Menu</a>
+	    <h1>Food Pass</h1>
+  	</div>
+
+	
+
+  <div data-role="main" class="ui-content">
+
+<div class="demo-container">
+	<h2>카드정보입력</h2>
+        <div class="card-wrapper"></div>
+
+        <div class="form-container active">
+            <form action="">
+                <input placeholder="Card number" type="text" name="number">
+                <input placeholder="Full name" type="text" name="name">
+                <input placeholder="MM/YY" type="text" name="expiry">
+                <input placeholder="CVC" type="text" name="cvc">
+            </form>
+            
+            <h2>주문내역</h2>
+		    <ol id="orderListView" data-role="listview" data-inset="true" data-theme="b">
+		      	<!-- <li>List Item</li>
+		      	<li>List Item</li>
+		      	<li>List Item</li> -->
+		    </ol>
+		    
+            <!-- <div id="paymentInfo">
+            	
+            </div> -->
+            
+        </div>
+    </div>  
+    
+	  	<!-- <fieldset class="ui-field-contain">
+	    	
+	  	</fieldset> -->
+	  	
+    	<h3 id="payDisplay">결제금액 : </h3>
+    	
+		<div>
+		   	<a href="#" class="ui-btn ui-btn-inline ui-btn-b" id="payMent" rel="external" onclick="panmentReq()">결제하기</a>
+		   	<a href="#" class="ui-btn ui-btn-inline ui-icon-arrow-l ui-btn-icon-left ui-btn-b" data-rel="back">돌아가기</a>
+		</div>
+  
+</div>	    	
+  
+
+ <!--  <div data-role="navbar">
+      <ul>
+        <li><a href="#" data-icon="home" data-theme="a">HOME</a></li>
+        <li><a href="#" data-icon="arrow-r">FORWARD</a></li>
+        <li><a href="#" data-icon="arrow-r">BACK</a></li>
+        <li><a href="#" data-icon="search" data-theme="a">SEARCH</a></li>
+      </ul>
+    </div>   --> 
+  <div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+	<h4 align="center">TheodoreSoft Corporation. </h4>
+  </div>
+
+
+
+<script>
+        $('.active form').card({
+            container: $('.card-wrapper')
+        })
+        
+</script>
+
+
+</body>
+
+
+</html>
+ 
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 
+ 

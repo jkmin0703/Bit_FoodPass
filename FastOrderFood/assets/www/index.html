@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+<!-- Include meta tag to ensure proper rendering and touch zooming -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<!-- Include jQuery Mobile stylesheets -->
+<link rel="stylesheet" href="js/jquery.mobile-1.4.5.min.css">
+<link rel="stylesheet" href="css/signUp.css">
+<link rel="stylesheet" href="../css/icon.css">
+<!-- Include the jQuery library -->
+<script src="js/jquery-1.11.1.js"></script>
+<!--   <script src="js/cordova.js"></script> -->
+<!-- Include the jQuery Mobile library -->
+<script src="js/jquery.mobile-1.4.5.min.js"></script>
+<script src="js/fpCookie.js"></script>
+<style type="text/css">
+
+/* .ui-page {
+    background: transparent url(img/airplane.jpg);
+	background-size:100% 100%;
+}  */
+.MainComment {
+letter-spacing: .103em;
+word-spacing: .100em;
+text-indent: 1.429em;
+}
+.mainImg{
+max-width: 100%;
+width: auto\9;
+}
+
+</style>
+
+<script>
+			
+			
+$( document ).ready (function(){
+	
+		console.log(fpMemberGetCookie("fpMemberName"));
+			
+		setTimeout( function() {
+		    document.location.href="#MainPage";
+		    
+		}, 1000);  // 2 seconds
+		
+		if(fpMemberGetCookie("fpMemberName")!= null){
+			$('#loginBtn').hide();
+			$('#signUpBtn').hide();			
+		}else {
+			$('#logoutBtn').hide();
+		}
+		
+	$('#logoutBtn').click (function(){
+		localStorage.clear();
+		location.reload();
+	});
+		
+		
+});
+
+
+
+	
+	
+
+
+	  
+
+
+</script>
+
+
+
+</head>
+<body>
+
+<!-- Start Page -->
+
+
+<div data-role="page" id="pageone" data-theme="b">
+
+
+</br></br></br></br></br>
+
+
+
+<div class="MainComment" id="comment">
+	<h2><strong>FOOD-PASS</strong></h2>
+	<P> ALL NEW RESERVATION SYSTEM.
+</div>
+
+</div>
+
+
+
+
+
+
+
+
+
+<!-- Main Page -->
+
+<div data-role="page" id="MainPage">
+	
+  <div data-role="panel" id="myPanel" data-theme="b"> 
+  <img border="0" src="img/foodpass_size.png" style="float:right;display:inline" width="50"/>
+
+    <h2>Food Pass 는?</h2>
+    <p>Food Pass 는 음식점에서 주문을 기다리지 않고 각 테이블에 부착되어 있는 QR코드를 스캔하여
+	     <br>기다림없이 바로 원하는 메뉴를 주문할 수 있는 주문결제 시스템 입니다.</p>
+  </div> 
+  
+  <div data-role="panel" id="cartPanel" data-theme="b" data-swipe-close="true" data-position="right"> 
+	     <h4>장바구니 입니다.</h4>
+	     <P>로그인이 필요합니다.</P>
+  </div> 
+
+
+
+  <div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+	<a href="#myPanel" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-info ui-btn-icon-left">Info</a>
+	<a href="#cartPanel" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-shopping-cart ui-btn-icon-left">Cart</a>
+    <h1>Food Pass</h1>
+  </div>
+
+	
+
+	 <div data-role="main" class="ui-content">
+		 <form>
+		 
+		 <img class="mainImg" alt="" src="img/restaurants_table.jpg">
+		 
+		 <div class="ui-grid-a">
+		 
+		 	<div class="ui-block-a">
+		 	<!--  Left Block-->
+		 		
+		 		<a href="" id="qrScanBtn" data-role="button" data-theme="b" rel="external">QR-Scan</a>
+		 		<a href="" id="orderForm" data-role="button" data-theme="b" rel="external" >주문하기</a>
+		 	
+		 	</div>
+		 	
+		 	
+		 	<div class="ui-block-b">
+		 	<!--  Right Block-->
+		 		<a href="html/login.html" id="loginBtn" data-role="button" data-theme="b" rel="external">로그인</a>
+		 		<a href="html/signUp.html" id="signUpBtn" data-role="button" data-theme="b" rel="external">회원가입</a>
+		        <a href="#" id="logoutBtn" data-role="button" data-theme="b" rel="external">로그아웃</a>
+		 	
+		 	</div>
+		 	
+		</div>
+			<!-- <a href="#" data-icon="mail" data-iconpos="notext" data-role="button"></a>-->
+		 	<!-- <a href="venta.html" data-theme="" id="ventaOption">
+        		<img src="img/bigmag_set.png" width="26" height="26">
+        		<br/>
+        		Ventas
+			</a>
+			<a href="#user_info" data-role="button" data-theme="a" data-iconpos="right" data-icon="myapp-custom" >
+				Custom Icon
+			</a>
+			<img style="height: 80px; width: 80px;" id="newid" data-role="button" src="img/bigmag_set.png" data-iconpos="notext" data-theme="a" /> --> 
+	        
+		 	
+		   <!-- <div class="ui-input-btn ui-btn ui-btn-b">
+		       회원가입
+		       <input type="button" id="signUp" data-enhanced="true" value="Enhanced - Theme swatch B">
+		   </div> -->
+		   <!-- <div class="ui-input-btn ui-btn ui-btn-b">
+		       로그인
+		       <input type="button" id="login" data-enhanced="true" value="Enhanced - Theme swatch B" rel="external"> -->
+		   <!-- <div class="ui-input-btn ui-btn ui-btn-b">
+		       주문하기
+		       <input type="button" id="orderBtn" data-enhanced="true" value="Enhanced - Theme swatch B" >
+		   </div> -->
+		<!-- <p><a href="html/signUp.html" data-role="button" rel="external">회원가입</a></p>
+		<p><a href="html/login.html" data-role="button" rel="external">로그인</a></p> -->
+		
+		</form>
+		
+		
+	</div>	    	
+  
+    
+
+ <!--  <div data-role="navbar">
+      <ul>
+        <li><a href="#" data-icon="home" data-theme="a">HOME</a></li>
+        <li><a href="#" data-icon="arrow-r">FORWARD</a></li>
+        <li><a href="#" data-icon="arrow-r">BACK</a></li>
+        <li><a href="#" data-icon="search" data-theme="a">SEARCH</a></li>
+      </ul>
+    </div>   --> 
+  <div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+	<h4 align="center">TheodoreSoft Corporation. </h4>
+  </div>
+
+
+</div>
+
+
+	
+
+<script>
+/* 
+//주문관리 페이지 전환
+$( "#orderBtn" ).on( "click", function() {
+    $.mobile.changePage( "html/orderFoodForm.html");
+	});
+ */
+/* //회원가입 페이지 전환
+$( "#signUp" ).on( "click", function() {
+    $.mobile.changePage( "html/signUp.html");
+  }); */
+
+/* //로그인 페이지 전환
+$( "#login" ).on( "click", function() {
+    $.mobile.changePage( "html/login.html");
+}); */
+
+$('#orderForm').click( function(e){
+	
+	if(fpMemberGetCookie("fpMemberName")!= null){
+		document.location.href="html/orderFoodForm.html";
+	}else {
+		document.location.href="html/login.html";
+	}
+	
+});
+
+$('#qrScanBtn').click( function(e){
+	
+	if(fpMemberGetCookie("fpMemberName")!= null){
+		document.location.href="html/qrTest.html";
+	}else {
+		document.location.href="html/login.html";
+	}
+	
+});
+
+
+
+</script>
+
+
+</body>
+
+
+</html>
+ 

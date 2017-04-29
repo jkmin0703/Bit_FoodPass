@@ -1,0 +1,207 @@
+﻿<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="ko" xml:lang="ko">
+<head>
+
+<meta name="viewport" content="width=device-width, initial-scale=1"> 
+<meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<script src="../js/jquery-1.11.1.js"></script>
+<link rel="stylesheet" href="../js/jquery.mobile-1.4.5.min.css" />
+<link rel="stylesheet" href="../css/signUp.css">
+<script src="../js/jquery.js"></script>
+<script src="../js/jquery.mobile-1.4.5.min.js"></script>
+
+<script src="../js/com_ajax.js"></script>
+
+<!-- <script>
+	$(document).on('mobileinit', function() {
+	$.mobile.toolbar.prototype.options.addBackBtn = true;
+});
+</script> -->
+
+<script type="text/javascript">
+
+	var recv;
+	var orderInfos = [];
+	
+	function OrderInfo(foodName, quantity) {
+		this.foodName = foodName; //주문할 음식
+		this.quantity = quantity; //수량
+	}
+	
+	$(document).on('pagecreate', function() {
+		
+		
+	});
+	 
+	$(document).ready(function() {
+//		recvData("post", "http://125.131.112.30:7080/company/myShop/9/menuListRsp", function(data) {
+			recvData("post", "http://localhost:8080/company/myShop/9/menuListRsp", function(data) {
+			var jsonData = JSON.stringify(data);
+			console.log(jsonData);
+			recv = JSON.parse(jsonData);
+
+			for (var i in recv) {
+				console.log('+ ' + recv[i].categoryName);
+				
+				
+				for (var j in recv[i].menu) {
+					if (recv[i].menu != null) {
+						console.log(' - ' + recv[i].menu[j].food_name);
+						if (recv[i].menu[j].foodImgPath) {
+							console.log('   ㄴpath : ' + recv[i].menu[j].foodImgPath);
+						}
+					}
+				}
+			}
+				
+		});
+		
+		$('#btn_add').click(function (event) {
+			
+			var count = $('#select_count').val();
+			alert(count);
+			
+		});
+	}); 
+	 
+	
+</script>
+	
+<!-- 
+<style>
+ .ui-li-static.ui-collapsible > .ui-collapsible-heading {
+    margin: 0;
+}
+.ui-li-static.ui-collapsible {
+    padding: 0;
+}
+.ui-li-static.ui-collapsible > .ui-collapsible-heading > .ui-btn {
+    border-top-width: 0;
+}
+.ui-li-static.ui-collapsible > .ui-collapsible-heading.ui-collapsible-heading-collapsed > .ui-btn,
+.ui-li-static.ui-collapsible > .ui-collapsible-content {
+    border-bottom-width: 0;
+} 
+</style>
+ -->
+<body>
+<div data-role="page">
+	<!-- <div data-role="header">
+		<h1>음식 주문</h1>
+	</div> -->
+	<!-- <div data-role="panel" id="myPanel" data-theme="b"> 
+	     <a class="ui-btn ui-icon-home ui-btn-icon-left" data-rel="back">Home</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Foward</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-l ui-btn-icon-left">Back</a>
+	     <a href="#" class="ui-btn ui-icon-arrow-r ui-btn-icon-left">Right Arrow Button</a>
+  	</div>  -->
+	<div data-role="header" data-theme="b" data-position = "fixed" data-fullscreen="false">
+		<a href="#myPanel" class="ui-btn ui-corner-all ui-shadow ui-icon-bars ui-btn-icon-left">Menu</a>
+		<a href="#myPanel" class="ui-btn ui-btn-b ui-corner-all ui-shadow ui-icon-info ui-btn-icon-left">Info</a>
+	    <h1>음식 주문</h1>
+	</div>
+	<div data-role="main" style="text-align:center">
+		<!-- <div data-role="collapsible-set"> -->
+		<ul id="#foodList" data-role="listview" data-inset="true" data-shadow="false">
+		
+			<div data-role="collapsible" data-iconpos="right" data-collapsed="true">
+			<h3>버거</h3>
+				<ul data-role="listview" data-theme="b">
+					<li><a href="#">List Item 1</a></li>
+					<li><a href="#">List Item 2</a></li>
+					<li><a href="#">List Item 3</a></li>
+					<li><a href="#">List Item 4</a></li>
+				</ul>
+			</div>
+			
+			<div data-role="collapsible" data-iconpos="right" data-collapsed="true">
+			<h3>세트메뉴</h3>
+				<ul data-role="listview" data-theme="a">
+					<li>
+						<a href="#">새우버거세트</a>
+					</li>
+					<li>
+						<a href="#">빅맥세트
+							<div class="ui-grid-a">
+								<div class="ui-block-a" align="left">
+									<br/>
+									<!-- <h2>빅맥세트</h2> -->
+									<!-- <img src="../img/bigmag_set.png" /> -->
+									<!-- <img src="C:\Users\Administrator\workspace\MrKimFood\src\main\webapp\img\menu\Img_81.png" /> -->
+									<img src="http://localhost:8080/img/menu/Img_81.png" />
+								</div>
+								<div class="ui-block-b" align="left">
+									<h5>함량 : 800~1000 kcal</h5>
+									<h5>가격 : 6000원</h5>
+								<!-- </div>
+								<div class="ui-block-b" align="left"> -->
+									<span>개수 : </span>
+									<select name="select_count" id="select_count" 
+									data-native-menu="false" data-inline="true">
+								        <option value="1">1</option>
+								        <option value="2">2</option>
+								        <option value="3">3</option>
+								        <option value="4">4</option>
+										<option value="5">5</option>
+								        <option value="6">6</option>
+								        <option value="7">7</option>
+								        <option value="8">8</option>
+										<option value="9">9</option>
+								        <option value="10">10</option>
+								    </select>
+									<button id="btn_add" class="ui-btn ui-corner-all">추가</button>
+								</div>
+							</div>
+						</a>
+					</li>
+					<li><a href="#">상하이 버거 세트</a></li>
+					<li><a href="#">케이준 버거 세트</a></li>
+				</ul>				
+			</div>	
+		 	
+		 	<div data-role="collapsible" data-iconpos="right" data-collapsed="true">
+			<h3>맥까페</h3>
+				<div data-role="fieldcontain">
+					<fieldset data-role="controlgroup" data-mini="true">
+						<legend>메뉴선택</legend>
+						<label for="checkbox-input-1">Checkbox Input</label>
+						<input type="checkbox" name="checkbox-input-1" id="checkbox-input-1" />
+						<label for="checkbox-input-2">Checkbox Input</label>
+						<input type="checkbox" name="checkbox-input-2" id="checkbox-input-2" />
+					</fieldset>
+				</div>
+			</div>
+		 	
+		 	<div data-role="collapsible" data-iconpos="right" data-collapsed="true">
+		 		<h1>주문 내역</h1>
+		 	</div>
+		 	
+		</ul>
+		<!-- </div> -->
+		
+	</div>
+	
+	<div data-role="footer" data-theme="b" class="footer" data-position = "fixed" data-fullscreen="false">
+		<h4 align="center">TheodoreSoft Corporation. </h4>
+  	</div>
+
+</div>   
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
