@@ -1,0 +1,22 @@
+header.prodcthead {
+	border-bottom: 1px solid #ccc;
+	padding: 20px 0;
+	
+}
+
+.sns {
+	padding-top: 10px;
+}
+
+.sns ul li {
+	display: inline;
+}
+
+.sns a {
+	padding: 10px 10px 10px 25px;
+}
+.prodcthead h1 {
+	font-size: 28px;
+	display: inline;	
+}
+
