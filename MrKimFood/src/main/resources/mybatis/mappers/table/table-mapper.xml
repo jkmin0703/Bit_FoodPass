@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="table">
+
+<resultMap id="tablaMap" type="com.mrkimfood.gonggam.vo.TableVO">
+	<result column="table_id" property="tableId" />
+	<result column="no" property="no" />
+	<result column="seat_num" property="seatNum"/>
+	<result column="qr_code" property="qrCode" />
+	<result column="restaurant_id" property="restaurantId" />
+	<result column="isuse_table" property="isUseTable"/>
+</resultMap>
+  
+	<insert id="registerTable" parameterType="com.mrkimfood.gonggam.vo.TableVO">
+  	
+		<selectKey keyProperty="tableId" resultType="java.lang.Integer" order="BEFORE">
+			SELECT seq_table.NEXTVAL FROM DUAL
+		</selectKey>
+  
+  		INSERT INTO table_tb(table_id, no, qr_code, restaurant_id)
+		VALUES (
+			#{tableId},
+			#{no},			
+			#{qrCode},
+			#{restaurantId}
+		)
+	</insert>
+	
+	<select id="idSelectTable" parameterType="com.mrkimfood.gonggam.vo.TableVO"
+	    resultMap="tablaMap">
+	    
+	    SELECT *
+		FROM  table_tb 
+		WHERE restaurant_id=#{restaurantId} and table_id=#{tableId} and isuse_table like 'o'
+	    
+	</select>
+  
+  	<select id="selectListTable" parameterType="java.lang.Integer"
+  	    resultMap="tablaMap">
+		SELECT *
+		FROM  table_tb
+		WHERE restaurant_id=#{restaurantId}
+		and isuse_table like 'o'
+	</select>
+	
+	<!-- 한페이지에서 보여지는 게시물List를 반환 -->
+	<select id="selectListTableToPagging" parameterType="java.util.Map"
+			resultMap="tablaMap">
+		<![CDATA[
+			select *
+			from(
+			  select ROWNUM rnum, t.*
+			  from table_tb t
+			  where restaurant_id = #{shopId}
+			  and isuse_table like 'o'
+			  order by no desc
+			)
+			where rnum >= ( (#{page} - 1) * #{pageColumnSize} )+ 1
+			  and   rnum <= #{page} * #{pageColumnSize}
+		]]>
+	</select>
+	
+	<select id="selectTableMaxCount" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+		SELECT count(no)
+		FROM table_tb
+		WHERE restaurant_id = #{shopNo}
+	</select>
+	
+	<select id="selectTableCount" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+		SELECT count(no)
+		FROM TABLE_TB
+		WHERE restaurant_id = #{shopNo}
+		AND ISUSE_TABLE = 'o'
+	</select>
+	
+	<update id="updateTable" parameterType="com.mrkimfood.gonggam.vo.TableVO">
+		UPDATE	table_tb
+		SET		no=#{no},
+				qr_code=#{qrCode},
+				restaurant_id=#{restaurantId},
+				isuse_table=#{isUseTable}
+		WHERE	restaurant_id=#{restaurantId} and table_id=#{tableId}
+	</update>
+	<!-- 
+	<select id="selectIsUseTable" parameterType="com.mrkimfood.gonggam.vo.TableVO"
+	    resultType="String">
+		SELECT isuse_table
+		FROM TABLE_TB
+		WHERE RESTAURANT_ID=#{restaurantId} AND table_id=#{tableId}
+	</select>
+	 -->
+	<update id="updateIsUseTable" parameterType="com.mrkimfood.gonggam.vo.TableVO">
+		UPDATE	table_tb
+		SET		isuse_table=#{isUseTable}
+		WHERE	RESTAURANT_ID=#{restaurantId} AND table_id=#{tableId}
+	</update>
+	
+	<update id="deactivationTable" parameterType="com.mrkimfood.gonggam.vo.MakeTableInfoVO">
+		<![CDATA[
+			UPDATE table_tb
+			SET isuse_table = 'x'
+			WHERE isuse_table='o' AND
+			  restaurant_id = #{shopNo} AND
+			  no > #{tableNum} AND
+			  no <= #{activeTableNum}
+		]]> 
+	</update>
+	
+	<update id="activationTable" parameterType="com.mrkimfood.gonggam.vo.MakeTableInfoVO">
+		<![CDATA[
+			UPDATE table_tb
+			SET isuse_table = 'o'
+			WHERE isuse_table='x' AND
+			  restaurant_id = #{shopNo} AND
+			  no > #{activeTableNum} AND
+			  no <= #{tableNum}
+		]]> 
+	</update>
+	
+	<select id="selectTableNo" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	    select no 
+		from table_tb
+		where table_id = #{tableId}
+	</select>
+	
+  </mapper>

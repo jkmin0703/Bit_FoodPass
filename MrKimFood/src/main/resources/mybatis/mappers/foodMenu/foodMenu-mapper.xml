@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="foodMenu">
+	
+	<!-- 메뉴 입력(메뉴 정보) -->
+	<select id="createPK_FoodMenu" resultType="java.lang.Integer">
+		SELECT seq_foodMenu.NEXTVAL FROM DUAL
+	</select>
+	
+	<insert id="insertFoodMenu" parameterType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+		INSERT INTO food_menu_tb(food_id,
+		<if test="food_classify_id != -1">
+		   food_classify_id,
+		 </if>
+		    food_name, pay, 
+		<if test="calory != null and calory != '' ">
+			calory, 
+		</if>
+			 regdate, restaurant_id)
+		VALUES(
+			#{food_ID}
+		<if test="food_classify_id != -1">
+			,#{food_classify_id}
+		</if>
+			,#{food_name}
+			,#{pay}
+		<if test="calory != null and calory != '' ">
+			,#{calory}
+		</if>
+			,SYSDATE
+			,#{restaurant_ID}
+		)
+	</insert>
+	
+	<!-- 메뉴 입력(음식 이미지) -->
+	<select id="create_saveImgNum" resultType="java.lang.Integer">
+		SELECT seq_saveImageNum.NEXTVAL FROM dual
+	</select>
+	
+	<insert id="insertFoodMenuImage" parameterType="com.mrkimfood.gonggam.vo.FoodMenuImageVO">
+		<selectKey keyProperty="food_image_ID" resultType="java.lang.Integer" order="BEFORE">
+			SELECT seq_foodmenuimage.NEXTVAL FROM DUAL
+		</selectKey>
+		INSERT INTO food_menu_image_tb(food_image_id, save_imageName, save_path, food_id, file_size, original_imagename)
+		VALUES(
+			#{food_image_ID},
+			#{save_imageName},
+			#{save_path},
+			#{food_ID},
+			#{file_size},
+			#{original_imageName}
+		)
+	</insert>
+	
+	<!-- 메뉴 리스트 조회 -->
+	<select id="selectFoodList" parameterType="java.util.Map"
+			resultType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+		<![CDATA[
+		SELECT *
+		FROM(
+			select /*+ INDEX_DESC (rest RESTAURANT_TB_PK_1) */
+    			ROWNUM rnum, fm.*
+    		from food_menu_tb fm
+    		where restaurant_id = #{shopId}
+    	]]>
+    	<choose>
+    	    <when test="categoryNo =='' or categoryNo == null"></when><!-- 전체검색 -->
+    	    <when test="categoryNo == -1"><!-- 기타 검색 -->
+    	        and food_classify_id is null
+    	    </when>
+    	    <otherwise>	<!-- 카테고리에 해당하는 값들만 검색 -->
+    	         and food_classify_id = #{categoryNo}
+    	    </otherwise>
+    	</choose>
+    	<![CDATA[
+    		and isuse_food like 'o'
+		) food_menu_tb
+		where rnum >= ( (#{page} - 1) * #{pageColumnSize} )+ 1
+			  and   rnum <= #{page} * #{pageColumnSize}
+		]]>
+	</select>
+		
+	<!-- 메뉴 정보 조회 -->
+	<select id="selectFoodMenu" parameterType="java.lang.Integer"
+			resultType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+		SELECT *
+		FROM food_menu_tb
+		WHERE food_id = #{foodNo}
+		AND isuse_food like 'o'
+	</select>
+	
+	<select id="selectMenuImageList" parameterType="java.lang.Integer"
+		resultType="com.mrkimfood.gonggam.vo.FoodMenuImageVO">
+		SELECT *
+		FROM food_menu_image_tb
+		WHERE food_id = #{foodNo}
+	</select>
+	
+	
+	<!-- 메뉴 수정 -->
+	<update id="updateFoodMenu" parameterType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+		UPDATE food_menu_tb
+		SET food_name = #{food_name},
+			pay = #{pay},
+			
+		<choose>
+		    <when test="calory == null or calory == ''">
+		       calory=null,
+		    </when>
+		    <otherwise>
+		        calory=#{calory},
+		    </otherwise>
+		</choose>
+		
+		<choose>
+		    <when test="food_classify_id == -1">
+		        food_classify_id = null
+		    </when>
+		    <otherwise>
+		         food_classify_id = #{food_classify_id}
+		    </otherwise>
+		</choose>
+		WHERE food_id=#{food_ID}
+	</update>
+	
+	
+	<!-- 메뉴 삭제 -->
+	<update id="updateToDropFood" parameterType="java.lang.Integer">
+		UPDATE food_menu_tb
+		SET isuse_food = 'x'
+		WHERE food_ID = #{foodNo}
+	</update>
+	
+	<delete id="deleteFoodImage" parameterType="java.lang.Integer">
+		delete from food_menu_image_tb
+		where food_image_id = #{foodNo}
+	</delete>
+	
+	<!-- 메뉴 분류 테이블에서 삭제된 Id를 null로 변경한다. -->
+	<update id="updateFoodClassifyIdNull" parameterType="java.util.Map">
+	    update food_menu_tb
+		set food_classify_id = ''
+		where food_classify_id=#{foodClassifyId} and restaurant_ID=#{restaurantId}
+	</update>
+	
+	<!-- 메뉴 분류 Id를 입력한다. -->
+	<update id="updateFoodClassifyId" parameterType="java.util.Map">
+	    update food_menu_tb
+		set food_classify_id = #{foodClassifyId}
+		where restaurant_ID=#{restaurantId} and food_ID=#{foodId}
+	</update>
+	
+	<select id="selectFoodMenuListForClassify" parameterType="java.util.Map"
+	    resultType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+	    select * from
+		food_menu_tb
+		where restaurant_id=#{restaurantId} and food_classify_id=#{foodId}
+	</select>
+	
+	<!-- 메뉴에 해당하는 이미지가 있는지 count로 조회 -->
+	<select id="foodmenuImgCount" parameterType="java.lang.Integer"
+	    resultType="java.lang.Integer">
+	    select count(*)
+	    from food_menu_image_tb
+	    where food_id = #{foodMenuNo}
+	</select>
+	
+	<select id="selectMenuCount" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+		SELECT count(*)
+		FROM food_menu_tb
+		WHERE restaurant_id = #{shopNo}
+		AND ISUSE_FOOD = 'o'
+	</select>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

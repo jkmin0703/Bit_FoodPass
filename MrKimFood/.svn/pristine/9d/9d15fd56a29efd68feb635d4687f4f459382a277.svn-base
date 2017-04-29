@@ -1,0 +1,106 @@
+@CHARSET "UTF-8";
+
+/* test */
+/*
+div {
+	border: 1px solid red;
+}
+*/
+
+
+.main > .navigation {
+	text-align: center;
+	padding-top: 10px;
+}
+
+.topMenu {
+	height: 30px;
+	width: 100%;
+}
+
+.topMenu > ul{
+	padding-left: 0%;
+}
+
+.topMenu > ul > li {
+	list-style: none;
+	color: white;
+	width: 20%;
+	background-color: #2d2d2d;
+	display:inline-block;
+	line-height: 30px;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.topMenu > .menuLink {
+	text-decoration: none;
+	color: white;
+	display: block;
+	font-size: 12px;
+	font-weight: bold;
+	font-family: "Trebuchet MS", Dotum, Arial;
+}
+
+.navigation_whiteBoard{
+	width:81%;
+	height:200px;
+	background-color: #d9d9d9;
+	margin: 2px auto;
+}
+
+.navigation_slideBoard{
+	width:98.4%;
+	top:305px;
+	margin: 2px auto;
+	position: absolute;
+	visibility: visible;
+}
+
+.navigation_slideBoard > div{
+	display: inline-block;
+	width:20%;
+	height:100px;
+	vertical-align: top;
+} 
+
+.navigation_slideBoard > div > ul > li {
+	list-style: none;
+	line-height: 1.25em;
+	vertical-align: middle;
+	text-align: center;
+}
+
+.slide_AD{
+	width:81%;
+	height:200px;
+	border: 1px dotted blue;
+	background-color: #dbebff;
+	margin: 10px auto;
+}
+
+#sideBar{
+	display:inline-block;
+	margin: 5px;
+	width: 25%;
+	border-right: 1px solid black;
+}
+#content{
+	display:inline-block;
+	vertical-align: top;
+	margin: 5px auto;
+	width:70%;
+}
+
+#foodMenuInfo{
+	display:inline-block;
+	vertical-align: top;
+	margin: 5px;
+	width: 45%;
+}
+#foodMenuImage{
+	display:inline-block;
+	vertical-align: top;
+	margin: 5px;
+	width: 45%;
+}

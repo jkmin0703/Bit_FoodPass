@@ -1,0 +1,10 @@
+body {
+	font-size: 12px;
+	background-color: #E9E9E9;
+	font-family: "Malgun gothic", sans-serif;
+}
+
+.container {
+	background-color: #fff;
+}
+

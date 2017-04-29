@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="member">
+
+	<resultMap id="memberMap" type="com.mrkimfood.gonggam.vo.CompanyVO">
+		<result column="member_id" property="memberId" />
+		<result column="id" property="id" />
+		<result column="pw" property="pw" />
+		<result column="regdate" property="regDate" />
+		<result column="is_away" property="isAway" />
+		<result column="modifydate" property="modifyDate" />
+		<result column="license_num" property="licenseNum" />
+		<result column="presidant" property="presidant" />
+		<result column="business_name" property="businessName" />
+	</resultMap>
+
+	
+	<insert id="registerMember" parameterType="com.mrkimfood.gonggam.vo.CompanyVO">
+		
+		<selectKey keyProperty="memberId" resultType="java.lang.Integer" order="BEFORE">
+			SELECT seq_member.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO member_tb(member_id, id, pw, regdate, modifydate, 
+		license_num, presidant, business_name)
+		VALUES (
+			#{memberId},
+			#{id},
+			#{pw},
+			sysdate,
+			sysdate,
+			#{licenseNum},
+			#{presidant},
+			#{businessName}
+		)
+	</insert>
+	
+	<select id="selectMember" parameterType="com.mrkimfood.gonggam.vo.CompanyVO"
+		resultMap="memberMap" >
+		SELECT *
+		FROM  member_tb
+		WHERE id=#{id}
+		  AND pw=#{pw}
+		  AND is_away like 'o'
+	</select>
+	
+	<select id="selectMemberToMemberId" parameterType="java.lang.Integer"
+	    resultMap="memberMap">
+	    select *
+	    from member_tb
+	    where member_id=#{memberNo}
+	    and is_away like 'o'
+	</select>
+	
+	<select id="selectMemberList" resultType="com.mrkimfood.gonggam.vo.CompanyVO">
+		SELECT *
+		FROM   member_tb
+		AND is_away like 'o'
+	</select>
+	
+	<update id="updateMember" parameterType="com.mrkimfood.gonggam.vo.CompanyVO" >
+		UPDATE	member_tb
+		SET
+			member_id=#{memberId},
+			<choose>
+			    <when test="pw==null or pw=='' ">
+					modifydate=sysdate,
+					license_num=#{licenseNum},
+					presidant=#{presidant},
+					business_name=#{businessName}
+			    </when>
+			    <otherwise>
+			        pw=#{pw}
+			    </otherwise>
+			</choose>
+		WHERE	member_id=#{memberId}
+	</update>
+	
+	<select id="memberIdCheck" parameterType="java.lang.String" resultType="java.lang.Integer">
+	    select count(*)
+		from member_tb
+		where id like #{checkId}
+		and is_away like 'o'
+	</select>
+	
+	<update id="updateToDeleteMember" parameterType="java.lang.Integer">
+	    UPDATE member_tb
+	    SET
+	    	is_away = 'x'
+	    WHERE
+	    	member_id = #{memberNo}
+	</update>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

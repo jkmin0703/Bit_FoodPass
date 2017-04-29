@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="inMember">
+
+	<resultMap id="inMemberMap" type="com.mrkimfood.gonggam.vo.IndividualVO">
+		<result column="inmember_id" property="inMemberId" />
+		<result column="name" property="name" />
+		<result column="email" property="email" />
+		<result column="password" property="passWord" />
+	</resultMap>
+
+	
+	
+	
+	<insert id="registerInMember" parameterType="com.mrkimfood.gonggam.vo.IndividualVO">
+		
+		<selectKey keyProperty="inMemberId" resultType="java.lang.Integer" order="BEFORE">
+			SELECT seq_inmember.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		INSERT INTO individual_member_tb(inmember_id, name, email, password)
+		VALUES (
+			#{inMemberId},
+			#{name},
+			#{email},
+			#{passWord}
+		)
+
+	</insert>
+	
+	
+	
+	<select id="selectInMember" parameterType="com.mrkimfood.gonggam.vo.IndividualVO"
+		resultMap="inMemberMap" >
+		SELECT *
+		FROM  individual_member_tb
+		WHERE email=#{email}
+		  AND password=#{passWord}
+	</select>
+	
+	
+	
+	<select id="selectInMemberList" resultType="com.mrkimfood.gonggam.vo.IndividualVO">
+		SELECT *
+		FROM   individual_member_tb
+	</select>
+	
+	
+	
+	<update id="updateInMember" parameterType="com.mrkimfood.gonggam.vo.IndividualVO" >
+		UPDATE	individual_member_tb
+		SET		name=#{name},
+				email=#{email},
+				password=#{passWord}
+		WHERE	inmember_id=#{inMemberId}
+	</update>
+	
+	<select id="inMemberIdCheck" parameterType="java.lang.String" resultType="java.lang.Integer">
+	    select count(*)
+		from individual_member_tb
+		where email like #{checkId}
+	</select>
+	
+	
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

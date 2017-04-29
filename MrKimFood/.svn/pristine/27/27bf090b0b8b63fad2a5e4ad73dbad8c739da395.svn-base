@@ -1,0 +1,6 @@
+jdbc.driverClass=oracle.jdbc.OracleDriver
+jdbc.url=jdbc:oracle:thin:@neo.morpheus.re.kr:11521:orcl
+jdbc.username=c##student_gonggam
+jdbc.password=gonggam2014
+jdbc.size.min=3
+jdbc.size.max=10

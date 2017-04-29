@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="sales">
+    
+    <resultMap id="orderMenuMap" type="com.mrkimfood.gonggam.vo.OrderMenuVO">
+		<result column="order_id" property="orderId"/>
+		<result column="food_ID" property="foodId"/>
+		<result column="is_supply" property="isSupply"/>
+		<result column="num" property="num"/>
+		<result column="count" property="count"/>
+	</resultMap>
+    
+    <select id="toDay" resultType="java.lang.String">
+        select TO_CHAR(sysdate, 'yyyy"년"mm"월"dd"일"')
+		from dual
+    </select>
+    
+    <!-- 1. 해당 매장에서 오늘 날짜에 주문한 주문번호들을 검색 -->
+	<select id="selectOrderNoListToday" parameterType="java.lang.Integer"
+		resultType="java.lang.Integer">
+			select order_id
+			from order_manage_tb
+			where TO_CHAR(order_day, 'yy/mm/dd') like sysdate
+			<!-- where TO_CHAR(order_day, 'yy/mm/dd') like '14/12/04' -->
+			and restaurant_id= #{shopNo}
+	</select>
+	
+	<!-- 2. 검색한 주문번호들을 이용하여 오늘 날짜에 해당하는 주문내역 출력 -->
+	<select id="selectOrderMenuListToday" parameterType="java.util.List"
+	    resultMap="orderMenuMap">
+	    select *
+		from order_menu_tb
+		where order_id in
+			<!-- Mybatis 문법(foreach) -->
+			<foreach collection="list" item="item" index="index" separator="," open="(" close=")">
+			    #{item.value}
+			</foreach>
+	</select>
+	
+	<select id="selectShopFoodMenuList" parameterType="java.lang.Integer"
+	    resultType="com.mrkimfood.gonggam.vo.FoodMenuVO">
+		select fm.FOOD_ID, fm.RESTAURANT_ID, fc.FOOD_CLASSIFY_NAME as food_type, fm.FOOD_NAME, fm.PAY
+		from food_menu_tb fm, FOOD_CLASSIFY_TB fc
+		where  fc.FOOD_CLASSIFY_ID (+)= fm.FOOD_CLASSIFY_ID
+		and fm.RESTAURANT_ID = 9
+	</select>
+	
+</mapper>

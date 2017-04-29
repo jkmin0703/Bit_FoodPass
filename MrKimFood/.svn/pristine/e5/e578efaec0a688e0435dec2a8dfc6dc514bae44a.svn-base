@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="restauant">
+	
+	<!-- 음식점 -->
+	<insert id="restaurantInsert" parameterType="com.mrkimfood.gonggam.vo.RestaurantVO">
+		<selectKey keyProperty="restaurant_ID" resultType="java.lang.Integer" order="BEFORE">
+			SELECT seq_restaurant.NEXTVAL FROM DUAL
+		</selectKey>
+		
+		insert into restaurant_tb(restaurant_id, restaurant_name, address, restaurant_type, openingtime, closingtime, res_phone,member_id)
+		values(
+			#{restaurant_ID},
+			#{restaurant_name},
+			#{address},
+			#{restaurant_type},
+			#{openingTime},
+			#{closingTime},
+			#{res_phone},
+			#{member_ID}
+		)
+	</insert>
+	
+	<!-- 한페이지에서 보여지는 게시물List를 반환 -->
+	<select id="selectShopList" parameterType="java.util.Map"
+			resultType="com.mrkimfood.gonggam.vo.RestaurantVO">
+		<![CDATA[
+			select *
+			from(
+			  select /*+ INDEX_DESC (rest RESTAURANT_TB_PK_1) */
+    			ROWNUM rnum, rest.*
+			  from restaurant_tb rest
+			  where member_id = #{memberId}
+			  and is_manage like 'o'
+			)
+			where rnum >= ( (#{page} - 1) * #{pageColumnSize} )+ 1
+			  and   rnum <= #{page} * #{pageColumnSize}
+		]]>
+	</select>
+	
+	<!-- 해당 사용자가 관리하는 총 샵의 개수를 반환 -->
+	<select id="getTotalShopCount" parameterType="java.util.Map"
+	    resultType="java.lang.Integer">
+	    select count(*)
+	    from restaurant_tb
+	    where member_id = #{memberId}
+	    and is_manage like 'o'
+	</select>
+	
+	<select id="selectShopInfo" parameterType="java.lang.Integer"
+		resultType="com.mrkimfood.gonggam.vo.RestaurantVO">
+		select *
+		from restaurant_tb
+		where restaurant_ID=#{shopNo}
+	</select>
+	
+	<update id="restaurantUpdate" parameterType="com.mrkimfood.gonggam.vo.RestaurantVO">
+		 UPDATE restaurant_tb
+		 SET 
+		 	restaurant_id=#{restaurant_ID}
+		 	<if test="restaurant_name != null and restaurant_name != '' ">
+		 		,restaurant_name=#{restaurant_name}	</if>
+		 	<if test="address != null and address != '' ">
+		 		,address=#{address}	</if>
+		 	<if test="restaurant_type != null and restaurant_type != '' ">
+		 		,restaurant_type=#{restaurant_type}	</if>
+		 	<if test="openingTime != null and openingTime != '' ">
+		 		,openingtime=#{openingTime}	</if>
+		 	<if test="closingTime != null and closingTime != '' ">
+		 		,closingtime=#{closingTime}	</if>
+		 	<if test="res_phone != null and res_phone != '' ">
+		 		,res_phone=#{res_phone}	</if>
+		 WHERE restaurant_id=#{restaurant_ID}
+		 and member_id = #{member_ID}
+	</update>
+	
+	<update id="updateDropShop" parameterType="java.lang.Integer">
+		UPDATE restaurant_tb
+		SET is_manage = 'x'
+		WHERE restaurant_id = #{shopNo}
+	</update>
+	
+	<select id="selectRestaurantName" parameterType="java.lang.Integer" resultType="String">
+	    select RESTAURANT_NAME
+		from RESTAURANT_TB
+		where RESTAURANT_ID = #{value}
+	</select>
+	
+	<select id="selectBarList" parameterType="java.lang.Integer" resultType="com.mrkimfood.gonggam.vo.RestaurantVO">
+	    select restaurant_id, restaurant_name
+		from restaurant_tb
+		where member_id = #{memberNo}
+		and is_manage like 'o'
+		order by restaurant_id desc
+	</select>
+	
+	<select id="maxShopNo" parameterType="java.lang.Integer" resultType="java.lang.Integer">
+	    select max(restaurant_id)
+		from restaurant_tb
+		where member_id = #{memberNo}
+		and is_manage like 'o'
+	</select>
+	
+</mapper>

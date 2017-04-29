@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orderMenu">
+	
+	<resultMap id="orderMenuMap" type="com.mrkimfood.gonggam.vo.OrderMenuVO">
+		<result column="order_id" property="orderId"/>
+		<result column="food_ID" property="foodId"/>
+		<result column="is_supply" property="isSupply"/>
+		<result column="num" property="num"/>
+		<result column="count" property="count"/>
+	</resultMap>
+	
+	<insert id="inOrderMenu" parameterType="com.mrkimfood.gonggam.vo.OrderMenuVO">
+		
+		insert into order_menu_tb (order_id, food_ID, is_supply, num, count) 
+			values (
+			#{orderId}, 
+			#{foodId}, 
+			#{isSupply},
+			#{num},
+			#{count}
+			)		
+	</insert>
+	
+	<select id="selectOrderMenuList" resultMap="orderMenuMap" parameterType="Integer">
+		select * from order_menu_tb 
+		where order_id = #{orderId} and is_supply like 'x'
+	</select>
+	
+	<update id="updateOrderMenu" parameterType="com.mrkimfood.gonggam.vo.OrderMenuVO">
+		update order_menu_tb 
+		set 
+		food_id=#{foodId}, is_supply=#{isSupply}, count=#{count} 
+		where (order_id=#{orderId} and num=#{num})
+	</update>
+	
+	<update id="updateOrderIsSupply" parameterType="java.util.Map">
+		update order_menu_tb 
+		set is_supply=#{isSupply}
+		where order_id=#{orderId} and num=#{num}
+	</update>
+			
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="orderMg">
+	
+	<resultMap id="orderMgMap" type="com.mrkimfood.gonggam.vo.OrderManageVO">
+		<result column="order_id" property="orderId"/>
+		<result column="order_day" property="orderDay"/>
+		<result column="order_time" property="orderTime"/>
+		<result column="payment_way" property="paymentWay"/>
+		<result column="payment_sum" property="paymentSum"/>
+		<result column="Restaurant_ID" property="restaurantId"/>
+		<result column="table_ID" property="tableId"/>
+		<result column="whether_payment" property="whetherPayment"/>
+	</resultMap>
+	
+	<insert id="inOrderMg" parameterType="com.mrkimfood.gonggam.vo.OrderManageVO">
+		<selectKey keyProperty="orderId" resultType="Integer" order="BEFORE">
+			SELECT order_seq.NEXTVAL FROM DUAL
+		</selectKey>
+	
+		insert into order_manage_tb (order_id, order_day, order_Time, payment_way, 
+									Restaurant_ID, table_ID, whether_payment)
+		values (
+			#{orderId},
+			SYSDATE,
+			SYSDATE,
+			#{paymentWay},
+			#{restaurantId},
+			#{tableId},
+			#{whetherPayment}
+		)
+		
+	</insert>
+	
+	<select id="selectOrderMg" parameterType="Integer" resultMap="orderMgMap">
+		select * from order_manage_tb 
+		where order_id = #{orderId}		
+	</select>
+	
+	<select id="selectOrderMgList" parameterType="Integer" resultMap="orderMgMap">
+		select * 
+		from order_manage_tb 
+		where Restaurant_ID = #{restaurantId}
+	</select>
+	
+	<update id="updateOrderMg" parameterType="com.mrkimfood.gonggam.vo.OrderManageVO">
+		update order_manage_tb 
+		set payment_way = #{paymentWay},
+			order_day = SYSDATE,
+			order_time = SYSDATE,
+			payment_sum = #{paymentSum},
+			whether_payment = #{whetherPayment}
+		where order_id = #{orderId}
+	</update>
+	
+</mapper>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
